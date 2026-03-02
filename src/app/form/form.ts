@@ -15,6 +15,7 @@ export class Form {
   protected readonly formGroup = this.fb.group({
     name: '',
     city: '',
+    phone: '',
   });
 
   async fillForm(value: string) {
@@ -35,5 +36,6 @@ export class Form {
       },
     });
     console.log(result);
+    this.formGroup.setValue(JSON.parse(result));
   }
 }
