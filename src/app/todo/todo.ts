@@ -76,6 +76,26 @@ export class Todo implements OnInit {
 
   async* inferPromptApi(userPrompt: string): AsyncGenerator<string> {
     // LAB #12
+    const systemPrompt = `
+      The user will ask questions about their todo list.
+      Here's the user's todo list: ${JSON.stringify(this.todos())}`;
+    const languageModel = await LanguageModel.create({
+      initialPrompts: [{ role: 'system', content: systemPrompt }],
+    });
+
+    const start = performance.now();
+    const chunks = languageModel.promptStreaming(userPrompt);
+    for await (const chunk of chunks) {
+      yield chunk;
+    }
+    const end = performance.now();
+    const duration = (end - start) / 1000;
+    const generatedTokens = (languageModel as any).contextUsage;
+    console.log(`Generation stats:
+             Duration: ${duration.toFixed(2)}s
+             Tokens: ${generatedTokens}
+             Tokens/sec: ${(generatedTokens / duration).toFixed(2)}
+           `);
   }
 
   addTodo(text: string | null = null) {
