@@ -17,5 +17,23 @@ export class Form {
     city: '',
   });
 
-  async fillForm(value: string) {}
+  async fillForm(value: string) {
+    const languageModel = await LanguageModel.create({
+      initialPrompts: [{
+        role: 'system',
+        content: `Extract the information to a JSON object of this shape:
+          ${JSON.stringify(this.formGroup.value)}`,
+      }],
+    });
+    const result = await languageModel.prompt(value, {
+      responseConstraint: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          city: { type: 'string' },
+        },
+      },
+    });
+    console.log(result);
+  }
 }
